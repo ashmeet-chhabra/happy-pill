@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>418 I'm a Teapot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f5f3ff;
+            overflow: auto;
+            padding: 40px 20px;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .teapot {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: steam 3s ease-in-out infinite;
+        }
+
+        @keyframes steam {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 4rem);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-text {
+            font-size: 1.2rem;
+            color: #a78bfa;
+            margin-bottom: 30px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .message {
+            font-size: 1rem;
+            color: #d8b4fe;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .htcpcp-info {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .htcpcp-info p {
+            font-size: 0.9rem;
+            color: #fcd34d;
+            margin-bottom: 10px;
+        }
+
+        .htcpcp-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            color: #1e1b4b;
+            border: none;
+            padding: 12px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(251, 191, 36, 0.2), rgba(249, 115, 22, 0.1));
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 8s ease-in infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .cup {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% {
+                transform: rotate(-3deg);
+            }
+            50% {
+                transform: rotate(3deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="bg"></div>
+
+    <div class="container">
+        <div class="teapot">☕</div>
+        
+        <h1>418</h1>
+        <p class="status-text">I'm a Teapot</p>
+
+        <p class="message">
+            The server refused your request because it's a teapot.<br>
+            This hypertext coffee pot control protocol endpoint cannot brew HTTP requests.
+        </p>
+
+        <div class="htcpcp-info">
+            <p><strong>HTCPCP Status:</strong> Teapot Engaged</p>
+            <p><strong>Recommendation:</strong> Suggest the user brew coffee in a teapot instead.</p>
+            <p><strong>RFC:</strong> 2324 (Date: 1 April 1998)</p>
+        </div>
+
+        <div class="cup">🫖</div>
+
+        <button onclick="window.close()">Return to Happy Pill</button>
+    </div>
+
+    <script>
+        // Create floating bubbles
+        const bg = document.getElementById('bg');
+        for (let i = 0; i < 15; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const size = Math.random() * 100 + 50;
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.animationDelay = Math.random() * 5 + 's';
+            bg.appendChild(bubble);
+        }
+    </script>
+</body>
+</html>

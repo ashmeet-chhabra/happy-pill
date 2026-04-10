@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import WebcamPreview from '@/components/WebcamPreview';
 import StatusPanel from '@/components/StatusPanel';
 import ControlsBar from '@/components/ControlsBar';
 import YouTubePlayerPanel from '@/components/YouTubePlayerPanel';
+import FrownPopup from '@/components/FrownPopup';
 import { useCameraStream } from '@/hooks/useCameraStream';
 import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
 import { useSmileAnalysis } from '@/hooks/useSmileAnalysis';
@@ -25,6 +26,7 @@ const validTransitions: Record<AppStatus, AppStatus[]> = {
 
 const GRACE_PERIOD_DURATION_MS = 5000;
 const MANUAL_SMILE_MODE = !import.meta.env.VITE_GEMINI_API_KEY;
+const FROWN_SCAN_THRESHOLD = 3;
 
 export default function App() {
   const { videoRef, isConnected, error, connectCamera, disconnectCamera } = useCameraStream();
@@ -44,6 +46,8 @@ export default function App() {
   const [gracePeriodState, setGracePeriodState] = useState<GracePeriodState>('inactive');
   const [errorCode, setErrorCode] = useState<AppErrorCode>('none');
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [frownScanCount, setFrownScanCount] = useState(0);
+  const [showFrownPopup, setShowFrownPopup] = useState(false);
   const analysisStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { isAnalyzing } = useSmileAnalysis({
@@ -53,8 +57,25 @@ export default function App() {
     initialDelayMs: 500,
     onSmileState: (nextSmileState) => {
       setSmileState(nextSmileState);
-      setAnalysisState('running');
+      // Don't resume analysis if popup is showing
+      if (!showFrownPopup) {
+        setAnalysisState('running');
+      }
       setErrorCode((currentCode) => (currentCode === 'analysis-failed' ? 'none' : currentCode));
+
+      // Handle frown counter on every scan
+      if (nextSmileState === 'not-smiling') {
+        setFrownScanCount((prev) => {
+          const nextCount = prev + 1;
+          if (nextCount >= FROWN_SCAN_THRESHOLD) {
+            setShowFrownPopup(true);
+          }
+          return nextCount;
+        });
+      } else if (nextSmileState === 'smiling' && !showFrownPopup) {
+        // Only reset frown count if popup is NOT showing
+        setFrownScanCount(0);
+      }
     },
     onError: (message) => {
       setAnalysisError(message);
@@ -78,6 +99,25 @@ export default function App() {
 
     return () => clearTimeout(timer);
   }, [gracePeriodState]);
+
+  // Pause analysis when frown popup appears
+  useEffect(() => {
+    if (showFrownPopup && analysisState === 'running') {
+      setAnalysisState('paused');
+    }
+  }, [showFrownPopup, analysisState]);
+
+  // Resume analysis when user returns from 418 page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && analysisState === 'paused' && appStatus === 'analyzing') {
+        setAnalysisState('running');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [analysisState, appStatus]);
 
   useEffect(() => {
     return () => {
@@ -222,7 +262,17 @@ export default function App() {
     setGracePeriodState('inactive');
     setErrorCode('none');
     setAnalysisError(null);
+    setFrownScanCount(0);
+    setShowFrownPopup(false);
     // Player state will be derived by effect based on hook state
+  };
+
+  const handleDrinkCoffee = () => {
+    setShowFrownPopup(false);
+    setFrownScanCount(0);
+    // Keep analysis paused while they're on the 418 page
+    // It will resume when they come back
+    window.open('/418.html', '_blank', 'noopener,noreferrer');
   };
 
   const handleToggleSmile = () => {
@@ -269,9 +319,9 @@ export default function App() {
         onStop={handleStopChallenge}
       />
 
-      <main className="flex-1 flex flex-col lg:flex-row gap-8 p-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 flex flex-col lg:flex-row gap-4 p-3 max-w-7xl mx-auto w-full">
         {/* Player Section */}
-        <div className="flex-1 flex flex-col gap-6">
+        <div className="flex-1 flex flex-col gap-3">
           <YouTubePlayerPanel
             containerRef={containerRef}
             isReady={isPlayerReady}
@@ -280,6 +330,7 @@ export default function App() {
             smileState={smileState}
             isConnected={isConnected}
             gracePeriodState={gracePeriodState}
+            suppressSmileOverlay={showFrownPopup}
           />
 
           <ControlsBar
@@ -295,7 +346,7 @@ export default function App() {
         </div>
 
         {/* Sidebar / Status Section */}
-        <div className="w-full lg:w-80 flex flex-col gap-6">
+        <div className="w-full lg:w-80 flex flex-col gap-3">
           <WebcamPreview
             videoRef={videoRef}
             isConnected={isConnected}
@@ -316,9 +367,14 @@ export default function App() {
         </div>
       </main>
 
+      <FrownPopup
+        open={showFrownPopup}
+        onDrink={handleDrinkCoffee}
+      />
+
       {/* Footer */}
-      <footer className="p-6 text-center">
-        <p className="text-zinc-700 text-[10px] uppercase tracking-[0.4em] font-bold">
+      <footer className="p-2 text-center bg-zinc-950/80 backdrop-blur-sm border-t border-white/5">
+        <p className="neon-red text-[10px] uppercase tracking-[0.4em] font-bold">
           Keep grinning.
         </p>
       </footer>

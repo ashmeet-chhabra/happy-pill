@@ -20,6 +20,11 @@
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
+.neon-red {
+  color: #ff0066;
+  text-shadow: 0 0 10px #ff0066, 0 0 20px #ff0066, 0 0 30px #ff0066, 0 0 40px #ff0033;
+}
+
 @keyframes scan {
   0% { top: 0%; }
   100% { top: 100%; }

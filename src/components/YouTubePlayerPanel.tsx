@@ -11,6 +11,7 @@ interface YouTubePlayerPanelProps {
   smileState: SmileState;
   isConnected: boolean;
   gracePeriodState: 'active' | 'inactive' | 'expired';
+  suppressSmileOverlay?: boolean;
 }
 
 export default function YouTubePlayerPanel({
@@ -20,8 +21,9 @@ export default function YouTubePlayerPanel({
   smileState,
   isConnected,
   gracePeriodState,
+  suppressSmileOverlay = false,
 }: YouTubePlayerPanelProps) {
-  const showSmileOverlay = !isConnected || (smileState === 'not-smiling' && gracePeriodState !== 'active');
+  const showSmileOverlay = !suppressSmileOverlay && (!isConnected || (smileState === 'not-smiling' && gracePeriodState !== 'active'));
 
   return (
     <div className="aspect-video glass-panel rounded-[2rem] overflow-hidden relative group border-2 border-white/5">
@@ -43,7 +45,7 @@ export default function YouTubePlayerPanel({
               <Frown className="w-20 h-20 text-red-500 mb-6" />
             </motion.div>
             <h2 className="text-3xl font-display font-bold mb-2">Wipe That Frown Off!</h2>
-            <p className="text-zinc-400 max-w-md">Our AI has detected a lack of joy. Sadness is a privilege reserved for those who can maintain a smile. It's for your own good.</p>
+            <p className="text-zinc-400 max-w-md">The smile detector has noted your lack of joy. Please maintain your grin to keep the music playing. This is for your own good.</p>
           </motion.div>
         )}
       </AnimatePresence>
