@@ -38,7 +38,7 @@ export async function analyzeSmileFromBase64Jpeg(base64Data: string): Promise<An
     contents: [
       {
         parts: [
-          { text: "Is this person smiling? Answer 'YES' or 'NO' only." },
+          { text: "Does this image contain a visible smile, whether on a human, drawing, cutout, or any object? Answer 'YES' or 'NO' only." },
           {
             inlineData: {
               mimeType: 'image/jpeg',
