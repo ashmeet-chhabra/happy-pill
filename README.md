@@ -9,7 +9,7 @@ This is a submission for the [DEV April Fools Challenge](https://dev.to/challeng
 - **Grace Period:** Gives you a few seconds to start smiling before the smile detection affects playback.
 - **Manual Smile Toggle:** If automatic smile detection is unavailable (e.g., missing or invalid Gemini API key), you can manually toggle your smile state using a dedicated button.
 - **Responsive UI:** Works well on both desktop and mobile devices.
-- **HTCPCP Teapot Easter Egg:** Frown for 3 consecutive scans (~15 seconds) and get a tea-themed popup suggesting you drink coffee. Click "Drink" to visit a custom HTTP 418 I'm a Teapot error page (based on RFC 2324).
+- **HTCPCP Teapot Easter Egg:** Lack of smile for about 15 seconds will get you a popup suggesting you drink coffee. Click "Drink" to visit a custom HTTP 418 I'm a Teapot error page (based on RFC 2324).
 
 ## Getting Started
 
@@ -36,7 +36,7 @@ This is a submission for the [DEV April Fools Challenge](https://dev.to/challeng
        ```
        VITE_GEMINI_API_KEY=your_api_key_here
        ```
-    - If you skip this step or the key is invalid, the app will automatically enable the **manual smile toggle** as a fallback, allowing you to control the smile state manually.
+    - If you skip this step, the app will automatically enable the **manual smile toggle** as a fallback, allowing you to control the smile state manually.
 
 ### Running the App
 

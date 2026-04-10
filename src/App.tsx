@@ -26,7 +26,8 @@ const validTransitions: Record<AppStatus, AppStatus[]> = {
 
 const GRACE_PERIOD_DURATION_MS = 5000;
 const MANUAL_SMILE_MODE = !import.meta.env.VITE_GEMINI_API_KEY;
-const FROWN_SCAN_THRESHOLD = 3;
+const FROWN_SCAN_THRESHOLD = 4; // 4 scans × 4 seconds = 16 seconds
+const MANUAL_FROWN_DURATION_MS = 16000; // 16 seconds of continuous frowning
 
 export default function App() {
   const { videoRef, isConnected, error, connectCamera, disconnectCamera } = useCameraStream();
@@ -49,11 +50,12 @@ export default function App() {
   const [frownScanCount, setFrownScanCount] = useState(0);
   const [showFrownPopup, setShowFrownPopup] = useState(false);
   const analysisStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const manualFrownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { isAnalyzing } = useSmileAnalysis({
     videoRef,
     enabled: !MANUAL_SMILE_MODE && isConnected && analysisState === 'running',
-    intervalMs: 5000,
+    intervalMs: 4000,
     initialDelayMs: 500,
     onSmileState: (nextSmileState) => {
       setSmileState(nextSmileState);
@@ -63,7 +65,7 @@ export default function App() {
       }
       setErrorCode((currentCode) => (currentCode === 'analysis-failed' ? 'none' : currentCode));
 
-      // Handle frown counter on every scan
+      // Handle frown counter on every scan (API mode: 4 scans × 4 seconds = 16 seconds)
       if (nextSmileState === 'not-smiling') {
         setFrownScanCount((prev) => {
           const nextCount = prev + 1;
@@ -73,7 +75,7 @@ export default function App() {
           return nextCount;
         });
       } else if (nextSmileState === 'smiling' && !showFrownPopup) {
-        // Only reset frown count if popup is NOT showing
+        // Reset frown count when smiling if popup not showing
         setFrownScanCount(0);
       }
     },
@@ -119,11 +121,45 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [analysisState, appStatus]);
 
+  // Handle manual frown timer (only for toggle mode, not API mode)
+  useEffect(() => {
+    if (!MANUAL_SMILE_MODE) {
+      return;
+    }
+
+    if (smileState === 'not-smiling' && analysisState === 'running' && !showFrownPopup) {
+      // Start timer when in not-smiling state
+      if (!manualFrownTimerRef.current) {
+        manualFrownTimerRef.current = setTimeout(() => {
+          setShowFrownPopup(true);
+          manualFrownTimerRef.current = null;
+        }, MANUAL_FROWN_DURATION_MS);
+      }
+    } else {
+      // Clear timer when smile state changes away from not-smiling
+      if (manualFrownTimerRef.current) {
+        clearTimeout(manualFrownTimerRef.current);
+        manualFrownTimerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (manualFrownTimerRef.current) {
+        clearTimeout(manualFrownTimerRef.current);
+        manualFrownTimerRef.current = null;
+      }
+    };
+  }, [MANUAL_SMILE_MODE, smileState, analysisState, showFrownPopup]);
+
   useEffect(() => {
     return () => {
       if (analysisStartTimeoutRef.current) {
         clearTimeout(analysisStartTimeoutRef.current);
         analysisStartTimeoutRef.current = null;
+      }
+      if (manualFrownTimerRef.current) {
+        clearTimeout(manualFrownTimerRef.current);
+        manualFrownTimerRef.current = null;
       }
     };
   }, []);
@@ -282,6 +318,9 @@ export default function App() {
 
     setSmileState((prev) => {
       const nextSmileState = prev === 'smiling' ? 'not-smiling' : 'smiling';
+
+      // In manual mode, the frown timer effect will handle the popup trigger
+      // (no need to manage counter here)
 
       // Only allow smile state to control playback if grace period has expired
       if (gracePeriodState !== 'active') {
