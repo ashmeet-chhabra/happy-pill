@@ -43,7 +43,7 @@ export default function YouTubePlayerPanel({
               <Frown className="w-20 h-20 text-red-500 mb-6" />
             </motion.div>
             <h2 className="text-3xl font-display font-bold mb-2">Wipe That Frown Off!</h2>
-            <p className="text-zinc-400 max-w-md">Our AI has detected a lack of joy. Sad music is a privilege reserved for those who can maintain a smile. It's for your own good.</p>
+            <p className="text-zinc-400 max-w-md">Our AI has detected a lack of joy. Sadness is a privilege reserved for those who can maintain a smile. It's for your own good.</p>
           </motion.div>
         )}
       </AnimatePresence>
