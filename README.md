@@ -8,6 +8,7 @@ This is a submission for the [DEV April Fools Challenge](https://dev.to/challeng
 - **Status Panel:** Displays the current state of the camera, smile analysis, and video playback.
 - **Grace Period:** Gives you a few seconds to start smiling before the smile detection affects playback.
 - **Manual Smile Toggle:** If automatic smile detection is unavailable (e.g., missing or invalid Gemini API key), you can manually toggle your smile state using a dedicated button.
+- **HTCPCP Teapot Easter Egg:** Frown for 3 consecutive scans (~15 seconds) and get a tea-themed popup suggesting you drink coffee. Click "Drink" to visit a custom HTTP 418 I'm a Teapot error page (based on RFC 2324).
 - **Responsive UI:** Works well on both desktop and mobile devices.
 
 ## Getting Started
@@ -47,7 +48,8 @@ Open your browser and navigate to the local server address provided in the termi
 
 ## Project Structure
 
-- `src/components/` – UI components (Header, WebcamPreview, StatusPanel, ControlsBar, YouTubePlayerPanel)
+- `src/components/` – UI components (Header, WebcamPreview, StatusPanel, ControlsBar, YouTubePlayerPanel, FrownPopup)
 - `src/hooks/` – Custom React hooks for camera, smile analysis, and YouTube player logic
 - `src/services/` – Service modules for camera, Gemini API, and YouTube integration
 - `src/types/` – TypeScript type definitions
+- `public/418.html` – Custom HTCPCP teapot error page
