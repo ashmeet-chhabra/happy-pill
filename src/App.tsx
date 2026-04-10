@@ -121,13 +121,19 @@ export default function App() {
       return;
     }
 
+    // Defensive: never play if app is idle or analysis is not running
+    if (appStatus === 'idle' || analysisState !== 'running') {
+      pause();
+      return;
+    }
+
     // Apply rule: not-smiling = pause, smiling = play
     if (smileState === 'not-smiling' || smileState === 'unknown') {
       pause();
     } else if (smileState === 'smiling') {
       play();
     }
-  }, [gracePeriodState, smileState, analysisState, play, pause]);
+  }, [gracePeriodState, smileState, analysisState, play, pause, appStatus]);
 
   // During grace period, keep trying to start playback once the player becomes ready.
   useEffect(() => {
@@ -207,8 +213,8 @@ export default function App() {
     }
 
     disconnectCamera();
-    pause();
     seekToStart();
+    pause(); // Always pause after seeking to start
     // Reset all state to initial values
     setSmileState('unknown');
     setAppStatus('idle');
