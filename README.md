@@ -1,6 +1,6 @@
 # Happy Pill
 
-This is a submission for the [DEV April Fools Challenge](https://dev.to/challenges/aprilfools-2026)
+This is a submission for the [DEV April Fools Challenge](https://dev.to/beep_boop/are-you-ready-to-take-the-happy-pill-4nh)
 
 ## Getting Started
 
